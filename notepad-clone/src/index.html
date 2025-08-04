@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Ollama Check Overlay -->
+    <div id="ollama-overlay" class="ollama-overlay">
+      <div class="ollama-modal">
+        <div class="ollama-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <h2>Ollama Required</h2>
+        <p>This application requires Ollama to be installed and running.</p>
+        <div class="ollama-status">
+          <div class="status-item">
+            <i class="fas fa-download"></i>
+            <span>Installation: <span id="install-status">Checking...</span></span>
+          </div>
+          <div class="status-item">
+            <i class="fas fa-server"></i>
+            <span>Server: <span id="server-status">Checking...</span></span>
+          </div>
+          <div class="status-item">
+            <i class="fas fa-brain"></i>
+            <span>Model (gemma3:4b): <span id="model-status">Checking...</span></span>
+          </div>
+        </div>
+        <div class="ollama-actions">
+          <button id="retry-btn" class="retry-btn">
+            <i class="fas fa-redo"></i>
+            Retry Check
+          </button>
+          <button id="install-btn" class="install-btn">
+            <i class="fas fa-external-link-alt"></i>
+            Install Ollama
+          </button>
+        </div>
+        <div class="ollama-instructions">
+          <h3>How to install Ollama and gemma3:4b model:</h3>
+          <ol>
+            <li>Visit <a href="https://ollama.ai" target="_blank">ollama.ai</a></li>
+            <li>Download and install Ollama for your system</li>
+            <li>Start Ollama service</li>
+            <li>Install the gemma3:4b model: <code>ollama pull gemma3:4b</code></li>
+            <li>Restart this application</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-container">
+    <!-- Integrated Title Bar with Tabs -->
+    <div class="title-bar">
+      <div class="title-bar-left">
+        <div class="app-logo-dropdown">
+          <button class="app-logo-btn" id="app-logo-btn">
+            <i class="fas fa-edit"></i>
+          </button>
+          <div class="dropdown-menu" id="dropdown-menu">
+            <div class="dropdown-item" id="new-file-dropdown">
+              <i class="fas fa-file"></i>
+              <span>New File</span>
+            </div>
+            <div class="dropdown-item" id="open-file-dropdown">
+              <i class="fas fa-folder-open"></i>
+              <span>Open File</span>
+            </div>
+            <div class="dropdown-item" id="save-file-dropdown">
+              <i class="fas fa-save"></i>
+              <span>Save</span>
+            </div>
+            <div class="dropdown-item" id="save-as-file-dropdown">
+              <i class="fas fa-save"></i>
+              <span>Save As</span>
+            </div>
+            <div class="dropdown-separator"></div>
+            <div class="dropdown-item" id="exit-app-dropdown">
+              <i class="fas fa-times"></i>
+              <span>Exit</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="title-bar-tabs">
+        <div class="tab-list" id="tab-list">
+          <!-- Tabs will be dynamically added here -->
+        </div>
+        <div class="tab-actions">
+          <button class="tab-action-btn" id="new-tab-btn" title="New Tab">
+            <i class="fas fa-plus"></i>
+          </button>
+          <button class="tab-action-btn" id="tab-overflow-btn" title="More Tabs">
+            <i class="fas fa-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="title-bar-actions">
+        <div class="ai-enhancement-dropdown" id="ai-enhancement">
+          <button class="ai-enhancement-btn" id="ai-enhancement-btn">
+            <i class="fas fa-star"></i>
+          </button>
+          <div class="ai-enhancement-menu" id="ai-enhancement-menu">
+            <!-- AI Mode Switcher -->
+            <div class="ai-mode-switcher">
+              <div class="mode-indicator">
+                <span class="mode-label">AI Mode:</span>
+                <span class="mode-value" id="current-ai-mode">Local</span>
+              </div>
+              <div class="mode-buttons">
+                <button class="mode-btn active" data-mode="local" id="local-mode-btn">
+                  <i class="fas fa-home"></i>
+                  Local
+                </button>
+                <button class="mode-btn" data-mode="external" id="external-mode-btn">
+                  <i class="fas fa-cloud"></i>
+                  API
+                </button>
+              </div>
+            </div>
+            <div class="ai-menu-separator"></div>
+            <div class="ai-menu-item" data-action="enhance">
+              <i class="fas fa-magic"></i>
+              <span>Enhance Text</span>
+            </div>
+            <div class="ai-menu-item" data-action="rewrite">
+              <i class="fas fa-edit"></i>
+              <span>Rewrite Content</span>
+            </div>
+            <div class="ai-menu-item" data-action="prompt-engineer">
+              <i class="fas fa-brain"></i>
+              <span>Prompt Engineer</span>
+            </div>
+            <div class="ai-menu-separator"></div>
+            <div class="ai-menu-item" data-action="summarize">
+              <i class="fas fa-compress-alt"></i>
+              <span>Summarize</span>
+            </div>
+            <div class="ai-menu-item" data-action="translate">
+              <i class="fas fa-language"></i>
+              <span>Translate</span>
+            </div>
+            <div class="ai-menu-item" data-action="grammar-check">
+              <i class="fas fa-spell-check"></i>
+              <span>Grammar Check</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="title-bar-right">
+        <button class="title-bar-btn" id="minimize-btn">
+          <i class="fas fa-window-minimize"></i>
+        </button>
+        <button class="title-bar-btn" id="maximize-btn">
+          <i class="fas fa-window-maximize"></i>
+        </button>
+        <button class="title-bar-btn close-btn" id="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Overflow Menu -->
+    <div class="tab-overflow-menu" id="tab-overflow-menu">
+      <!-- Overflow tabs will be listed here -->
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div class="editor-wrapper">
+        <div class="line-numbers" id="line-numbers"></div>
+        <div class="editor-container">
+          <textarea 
+            name="notepad" 
+            id="notepad" 
+            placeholder="Start typing your document here..."
+            spellcheck="false"
+          ></textarea>
+        </div>
+      </div>
+    </main>
+
+    <!-- Status Bar -->
+    <footer class="status-bar">
+      <div class="status-left">
+        <span id="file-info">Untitled</span>
+      </div>
+      <div class="status-center">
+        <span id="word-count">0 words</span>
+        <span class="separator">|</span>
+        <span id="char-count">0 characters</span>
+      </div>
+      <div class="status-right">
+        <span id="encoding">UTF-8</span>
+        <span class="separator">|</span>
+        <span id="line-info">Line 1, Col 1</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Tab management
+    let tabs = [];
+    let activeTabIndex = 0;
+    let tabCounter = 0;
+
+    const notepad = document.getElementById('notepad');
+    const lineNumbers = document.getElementById('line-numbers');
+    const aiEnhancementBtn = document.getElementById('ai-enhancement-btn');
+    const aiEnhancementMenu = document.getElementById('ai-enhancement-menu');
+    const fileInfo = document.getElementById('file-info');
+    const currentAIMode = document.getElementById('current-ai-mode');
+    const localModeBtn = document.getElementById('local-mode-btn');
+    const externalModeBtn = document.getElementById('external-mode-btn');
+    const wordCount = document.getElementById('word-count');
+    const charCount = document.getElementById('char-count');
+    const lineInfo = document.getElementById('line-info');
+    const tabList = document.getElementById('tab-list');
+
+    // Menu buttons
+    const newFileBtn = document.getElementById('new-file-dropdown');
+    const openFileBtn = document.getElementById('open-file-dropdown');
+    const saveFileBtn = document.getElementById('save-file-dropdown');
+    const saveAsFileBtn = document.getElementById('save-as-file-dropdown');
+    const exitAppBtn = document.getElementById('exit-app-dropdown');
+
+    // Tab buttons
+    const newTabBtn = document.getElementById('new-tab-btn');
+    const tabOverflowBtn = document.getElementById('tab-overflow-btn');
+    const tabOverflowMenu = document.getElementById('tab-overflow-menu');
+
+    // Window control buttons
+    const minimizeBtn = document.getElementById('minimize-btn');
+    const maximizeBtn = document.getElementById('maximize-btn');
+    const closeBtn = document.getElementById('close-btn');
+
+    // Dropdown elements
+    const appLogoBtn = document.getElementById('app-logo-btn');
+    const dropdownMenu = document.getElementById('dropdown-menu');
+
+    // Dropdown functionality
+    appLogoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('show');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+      dropdownMenu.classList.remove('show');
+    });
+
+    // Prevent dropdown from closing when clicking inside it
+    dropdownMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Tab management functions
+    function createTab(title = 'Untitled', content = '', filePath = null) {
+      const tab = {
+        id: tabCounter++,
+        title: title,
+        content: content,
+        originalContent: content,
+        filePath: filePath,
+        isModified: false
+      };
+      
+      tabs.push(tab);
+      renderTabs();
+      switchToTab(tabs.length - 1);
+      return tab;
+    }
+
+    function renderTabs() {
+      tabList.innerHTML = '';
+      const tabContainer = tabList.parentElement;
+      const containerWidth = tabContainer.offsetWidth;
+      const actionButtonsWidth = 80; // Approximate width of action buttons
+      const availableWidth = containerWidth - actionButtonsWidth;
+      
+      let currentWidth = 0;
+      let visibleTabs = [];
+      let overflowTabs = [];
+      
+      tabs.forEach((tab, index) => {
+        const tabElement = document.createElement('div');
+        tabElement.className = `tab ${index === activeTabIndex ? 'active' : ''}`;
+        tabElement.innerHTML = `
+          <span class="tab-title">${tab.title}${tab.isModified ? ' *' : ''}</span>
+          <button class="tab-close-btn" data-tab-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        
+        tabElement.addEventListener('click', (e) => {
+          if (!e.target.closest('.tab-close-btn')) {
+            switchToTab(index);
+          }
+        });
+        
+        // Calculate if this tab would fit
+        const estimatedTabWidth = Math.max(80, tab.title.length * 8 + 40); // Rough estimate
+        if (currentWidth + estimatedTabWidth <= availableWidth) {
+          tabList.appendChild(tabElement);
+          visibleTabs.push(index);
+          currentWidth += estimatedTabWidth;
+        } else {
+          overflowTabs.push({ tab, index, element: tabElement });
+        }
+      });
+      
+      // Show/hide overflow button based on whether there are overflow tabs
+      tabOverflowBtn.style.display = overflowTabs.length > 0 ? 'flex' : 'none';
+      
+      // Store overflow tabs for the overflow menu
+      window.overflowTabs = overflowTabs;
+    }
+
+    function showTabOverflowMenu() {
+      const overflowTabs = window.overflowTabs || [];
+      tabOverflowMenu.innerHTML = '';
+      
+      overflowTabs.forEach(({ tab, index, element }) => {
+        const menuItem = document.createElement('div');
+        menuItem.className = 'overflow-tab-item';
+        menuItem.innerHTML = `
+          <span class="overflow-tab-title">${tab.title}${tab.isModified ? ' *' : ''}</span>
+          <button class="overflow-tab-close-btn" data-tab-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        
+        menuItem.addEventListener('click', (e) => {
+          if (!e.target.closest('.overflow-tab-close-btn')) {
+            switchToTab(index);
+            tabOverflowMenu.classList.remove('show');
+          }
+        });
+        
+        tabOverflowMenu.appendChild(menuItem);
+      });
+      
+      tabOverflowMenu.classList.toggle('show');
+    }
+
+    function switchToTab(index) {
+      if (index < 0 || index >= tabs.length) return;
+      
+      // Save current tab content before switching
+      if (tabs[activeTabIndex]) {
+        const currentContent = notepad.value;
+        tabs[activeTabIndex].content = currentContent;
+        tabs[activeTabIndex].isModified = currentContent !== tabs[activeTabIndex].originalContent;
+      }
+      
+      activeTabIndex = index;
+      const tab = tabs[activeTabIndex];
+      
+      // Load tab content
+      notepad.value = tab.content;
+      
+      // Update UI
+      fileInfo.textContent = tab.title;
+      updateLineNumbers();
+      updateCounts();
+      updateCursorPosition();
+      renderTabs();
+    }
+
+    function closeTab(index) {
+      // Save current tab content before closing
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].content = notepad.value;
+        tabs[activeTabIndex].isModified = notepad.value !== tabs[activeTabIndex].originalContent;
+      }
+      
+      if (tabs.length <= 1) {
+        // Don't close the last tab, just clear it
+        tabs[0] = {
+          id: tabs[0].id,
+          title: 'Untitled',
+          content: '',
+          originalContent: '',
+          filePath: null,
+          isModified: false
+        };
+        activeTabIndex = 0;
+        notepad.value = '';
+        fileInfo.textContent = 'Untitled';
+        updateLineNumbers();
+        updateCounts();
+        updateCursorPosition();
+        renderTabs();
+        return;
+      }
+      
+      // Remove the tab
+      tabs.splice(index, 1);
+      
+      // Adjust active tab index
+      if (activeTabIndex >= index) {
+        activeTabIndex = Math.max(0, activeTabIndex - 1);
+      }
+      
+      // Switch to the new active tab
+      const newActiveTab = tabs[activeTabIndex];
+      notepad.value = newActiveTab.content;
+      fileInfo.textContent = newActiveTab.title;
+      updateLineNumbers();
+      updateCounts();
+      updateCursorPosition();
+      renderTabs();
+    }
+
+    // Window control event listeners
+    minimizeBtn.addEventListener('click', () => {
+      window.electronAPI.minimizeWindow();
+    });
+
+    maximizeBtn.addEventListener('click', () => {
+      window.electronAPI.maximizeWindow();
+    });
+
+    closeBtn.addEventListener('click', () => {
+      window.electronAPI.closeWindow();
+    });
+
+    // Tab event listeners
+    newTabBtn.addEventListener('click', () => {
+      createTab();
+    });
+
+    // Tab overflow functionality
+    tabOverflowBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showTabOverflowMenu();
+    });
+
+    // Close overflow menu when clicking outside
+    document.addEventListener('click', () => {
+      tabOverflowMenu.classList.remove('show');
+    });
+
+    // Prevent overflow menu from closing when clicking inside it
+    tabOverflowMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Dropdown menu event listeners
+    newFileBtn.addEventListener('click', async () => {
+      createTab();
+      dropdownMenu.classList.remove('show');
+    });
+
+    openFileBtn.addEventListener('click', async () => {
+      await window.electronAPI.openFile();
+      dropdownMenu.classList.remove('show');
+    });
+
+    saveFileBtn.addEventListener('click', async () => {
+      const content = notepad.value;
+      await window.electronAPI.saveFile(content);
+      dropdownMenu.classList.remove('show');
+    });
+
+    saveAsFileBtn.addEventListener('click', async () => {
+      const content = notepad.value;
+      await window.electronAPI.saveAsFile(content);
+      dropdownMenu.classList.remove('show');
+    });
+
+    exitAppBtn.addEventListener('click', () => {
+      window.electronAPI.closeWindow();
+    });
+
+    // Tab close button event delegation
+    tabList.addEventListener('click', (e) => {
+      if (e.target.closest('.tab-close-btn')) {
+        const tabIndex = parseInt(e.target.closest('.tab-close-btn').dataset.tabIndex);
+        closeTab(tabIndex);
+      }
+    });
+
+    // Overflow menu close button event delegation
+    tabOverflowMenu.addEventListener('click', (e) => {
+      if (e.target.closest('.overflow-tab-close-btn')) {
+        const tabIndex = parseInt(e.target.closest('.overflow-tab-close-btn').dataset.tabIndex);
+        closeTab(tabIndex);
+        tabOverflowMenu.classList.remove('show');
+      }
+    });
+
+    // Update line numbers
+    function updateLineNumbers() {
+      const lines = notepad.value.split('\n');
+      lineNumbers.innerHTML = lines.map((_, index) => `<div>${index + 1}</div>`).join('');
+    }
+
+    // Update word and character count
+    function updateCounts() {
+      const text = notepad.value;
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      const chars = text.length;
+      
+      wordCount.textContent = `${words} words`;
+      charCount.textContent = `${chars} characters`;
+    }
+
+    // Update cursor position
+    function updateCursorPosition() {
+      const text = notepad.value;
+      const cursorPos = notepad.selectionStart;
+      const lines = text.substring(0, cursorPos).split('\n');
+      const line = lines.length;
+      const col = lines[lines.length - 1].length + 1;
+      
+      lineInfo.textContent = `Line ${line}, Col ${col}`;
+    }
+
+    // AI Enhancement dropdown functionality
+    aiEnhancementBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      aiEnhancementMenu.classList.toggle('show');
+    });
+
+    // Close AI menu when clicking outside
+    document.addEventListener('click', () => {
+      aiEnhancementMenu.classList.remove('show');
+    });
+
+    // Prevent AI menu from closing when clicking inside it
+    aiEnhancementMenu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // AI Enhancement menu items
+    const aiMenuItems = document.querySelectorAll('.ai-menu-item');
+    aiMenuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const action = item.getAttribute('data-action');
+        handleAIAction(action);
+        aiEnhancementMenu.classList.remove('show');
+      });
+    });
+
+    // AI Mode switching functionality
+    localModeBtn.addEventListener('click', async () => {
+      try {
+        await window.electronAPI.switchAIMode('local');
+        updateAIModeDisplay('local');
+        showNotification('Switched to Local AI mode', 'success');
+      } catch (error) {
+        showNotification('Failed to switch to Local mode: ' + error.message, 'error');
+      }
+    });
+
+    externalModeBtn.addEventListener('click', async () => {
+      try {
+        await window.electronAPI.switchAIMode('external');
+        updateAIModeDisplay('external');
+        showNotification('Switched to External API mode', 'success');
+      } catch (error) {
+        showNotification('Failed to switch to External mode: ' + error.message, 'error');
+      }
+    });
+
+    // Update AI mode display
+    function updateAIModeDisplay(mode) {
+      currentAIMode.textContent = mode === 'local' ? 'Local' : 'API';
+      localModeBtn.classList.toggle('active', mode === 'local');
+      externalModeBtn.classList.toggle('active', mode === 'external');
+    }
+
+    // Initialize AI mode display
+    async function initializeAIMode() {
+      try {
+        const { mode } = await window.electronAPI.getAIMode();
+        updateAIModeDisplay(mode);
+      } catch (error) {
+        console.error('Failed to get AI mode:', error);
+        updateAIModeDisplay('local');
+      }
+    }
+
+    // Handle AI actions (placeholder for future implementation)
+    function handleAIAction(action) {
+      console.log(`AI Action: ${action} - To be implemented in future version`);
+      // Future AI enhancement functionality will be implemented here
+      switch(action) {
+        case 'enhance':
+          // TODO: Implement text enhancement
+          break;
+        case 'rewrite':
+          // TODO: Implement content rewriting
+          break;
+        case 'prompt-engineer':
+          // TODO: Implement prompt engineering
+          break;
+        case 'summarize':
+          // TODO: Implement text summarization
+          break;
+        case 'translate':
+          // TODO: Implement translation
+          break;
+        case 'grammar-check':
+          // TODO: Implement grammar checking
+          break;
+      }
+    }
+
+    // Ollama availability check
+    const ollamaOverlay = document.getElementById('ollama-overlay');
+    const installStatus = document.getElementById('install-status');
+    const serverStatus = document.getElementById('server-status');
+    const modelStatus = document.getElementById('model-status');
+    const retryBtn = document.getElementById('retry-btn');
+    const installBtn = document.getElementById('install-btn');
+
+    async function checkOllamaAvailability() {
+      try {
+        const status = await window.electronAPI.checkOllama();
+        
+        // Update status indicators
+        installStatus.textContent = status.installed ? 'Found' : 'Not Found';
+        installStatus.className = status.installed ? 'success' : 'error';
+        
+        serverStatus.textContent = status.server ? 'Running' : 'Not Running';
+        serverStatus.className = status.server ? 'success' : 'error';
+        
+        modelStatus.textContent = status.model ? 'Available' : 'Not Available';
+        modelStatus.className = status.model ? 'success' : 'error';
+        
+        // Check if any AI mode is available
+        const hasLocalAI = status.localStatus && status.localStatus.connected && status.localStatus.model;
+        const hasExternalAI = status.externalStatus && status.externalStatus.connected && status.externalStatus.model;
+        
+        if (hasLocalAI || hasExternalAI) {
+          // AI available, hide overlay and enable app
+          ollamaOverlay.classList.add('hidden');
+          enableApp();
+          
+          // Update mode display if available
+          if (status.mode) {
+            updateAIModeDisplay(status.mode);
+          }
+        } else {
+          // No AI available, show overlay and disable app
+          ollamaOverlay.classList.remove('hidden');
+          disableApp();
+        }
+      } catch (error) {
+        console.error('Error checking AI availability:', error);
+        ollamaOverlay.classList.remove('hidden');
+        disableApp();
+        
+        installStatus.textContent = 'Error';
+        installStatus.className = 'error';
+        serverStatus.textContent = 'Error';
+        serverStatus.className = 'error';
+        modelStatus.textContent = 'Error';
+        modelStatus.className = 'error';
+      }
+    }
+
+    function enableApp() {
+      // Enable all interactive elements
+      document.body.style.pointerEvents = 'auto';
+      notepad.disabled = false;
+      aiEnhancementBtn.disabled = false;
+      appLogoBtn.disabled = false;
+      // Enable other buttons as needed
+    }
+
+    function disableApp() {
+      // Disable all interactive elements
+      document.body.style.pointerEvents = 'none';
+      notepad.disabled = true;
+      aiEnhancementBtn.disabled = true;
+      appLogoBtn.disabled = true;
+      // Disable other buttons as needed
+    }
+
+    // Retry button event listener
+    retryBtn.addEventListener('click', () => {
+      installStatus.textContent = 'Checking...';
+      installStatus.className = '';
+      serverStatus.textContent = 'Checking...';
+      serverStatus.className = '';
+      modelStatus.textContent = 'Checking...';
+      modelStatus.className = '';
+      checkOllamaAvailability();
+    });
+
+    // Install button event listener
+    installBtn.addEventListener('click', () => {
+      window.open('https://ollama.ai', '_blank');
+    });
+
+                    // Check Ollama availability on startup
+                document.addEventListener('DOMContentLoaded', () => {
+                  checkOllamaAvailability();
+                  setupAIFeatures();
+                  initializeAIMode();
+                });
+
+                // AI Features Setup
+                function setupAIFeatures() {
+                  const aiMenuItems = document.querySelectorAll('.ai-menu-item');
+                  
+                  aiMenuItems.forEach(item => {
+                    item.addEventListener('click', async (e) => {
+                      e.preventDefault();
+                      const action = e.currentTarget.dataset.action;
+                      const content = notepad.value.trim();
+                      
+                      if (!content) {
+                        showNotification('Please enter some text to enhance.', 'warning');
+                        return;
+                      }
+                      
+                      // Show loading state
+                      showAILoading(item, action);
+                      
+                      try {
+                        console.log(`Processing AI action: ${action}`);
+                        
+                        // Show progress message for longer operations
+                        const progressMessage = action === 'enhance' ? 'Enhancing text...' : 'Checking grammar...';
+                        showNotification(progressMessage, 'info');
+                        
+                        const result = await window.electronAPI.processAIAction(action, content);
+                        displayAIResult(result);
+                      } catch (error) {
+                        console.error('AI action error:', error);
+                        
+                        // Provide more helpful error messages
+                        let errorMessage = error.message;
+                        if (error.message.includes('timeout')) {
+                          errorMessage = 'AI processing timed out. Try with shorter text or check if Ollama is running properly.';
+                        } else if (error.message.includes('connection')) {
+                          errorMessage = 'Cannot connect to Ollama. Please ensure Ollama is running and the gemma3:4b model is available.';
+                        }
+                        
+                        showAIError(errorMessage);
+                      } finally {
+                        hideAILoading(item);
+                      }
+                    });
+                  });
+                }
+
+                // Show AI loading state
+                function showAILoading(item, action) {
+                  item.classList.add('loading');
+                  const icon = item.querySelector('i');
+                  const originalIcon = icon.className;
+                  icon.className = 'fas fa-spinner';
+                  
+                  // Store original icon for restoration
+                  item.dataset.originalIcon = originalIcon;
+                }
+
+                // Hide AI loading state
+                function hideAILoading(item) {
+                  item.classList.remove('loading');
+                  const icon = item.querySelector('i');
+                  const originalIcon = item.dataset.originalIcon;
+                  if (originalIcon) {
+                    icon.className = originalIcon;
+                  }
+                }
+
+                // Display AI result modal
+                function displayAIResult(result) {
+                  const modal = createAIResultModal(result);
+                  document.body.appendChild(modal);
+                  
+                  // Add event listeners
+                  setupModalEventListeners(modal, result);
+                }
+
+                // Create AI result modal
+                function createAIResultModal(result) {
+                  const modal = document.createElement('div');
+                  modal.className = 'ai-result-modal';
+                  
+                  // Determine content based on action type
+                  let contentHtml = '';
+                  let applyText = 'Apply Changes';
+                  let copyText = result.enhanced || result.corrected || '';
+                  
+                  if (result.action === 'grammar-check') {
+                    contentHtml = `
+                      <div class="modal-section">
+                        <h4>Original Text</h4>
+                        <div class="text-content">${escapeHtml(result.original)}</div>
+                      </div>
+                      <div class="modal-section">
+                        <h4>Corrected Text</h4>
+                        <div class="text-content">${escapeHtml(result.corrected)}</div>
+                        ${result.errors ? `<div class="explanation-content"><strong>Errors Found:</strong> ${escapeHtml(result.errors)}</div>` : ''}
+                        ${result.improvements ? `<div class="explanation-content"><strong>Improvements:</strong> ${escapeHtml(result.improvements)}</div>` : ''}
+                        ${result.tips ? `<div class="explanation-content"><strong>Grammar Tips:</strong> ${escapeHtml(result.tips)}</div>` : ''}
+                      </div>
+                    `;
+                    applyText = 'Apply Corrections';
+                    copyText = result.corrected || '';
+                  } else {
+                    contentHtml = `
+                      <div class="modal-section">
+                        <h4>Original Text</h4>
+                        <div class="text-content">${escapeHtml(result.original)}</div>
+                      </div>
+                      <div class="modal-section">
+                        <h4>Enhanced Text</h4>
+                        <div class="text-content">${escapeHtml(result.enhanced)}</div>
+                        ${result.explanation ? `<div class="explanation-content"><strong>Explanation:</strong> ${escapeHtml(result.explanation)}</div>` : ''}
+                      </div>
+                    `;
+                    applyText = 'Apply Changes';
+                    copyText = result.enhanced || '';
+                  }
+                  
+                  modal.innerHTML = `
+                    <div class="modal-container">
+                      <div class="modal-header">
+                        <h3>${result.title}</h3>
+                        <button class="modal-close-btn">&times;</button>
+                      </div>
+                      <div class="modal-content">
+                        ${contentHtml}
+                      </div>
+                      <div class="modal-actions">
+                        <button class="modal-btn apply-btn">
+                          <i class="fas fa-check"></i>
+                          ${applyText}
+                        </button>
+                        <button class="modal-btn copy-btn">
+                          <i class="fas fa-copy"></i>
+                          Copy Result
+                        </button>
+                        <button class="modal-btn cancel-btn">
+                          <i class="fas fa-times"></i>
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                  return modal;
+                }
+
+                // Setup modal event listeners
+                function setupModalEventListeners(modal, result) {
+                  const closeBtn = modal.querySelector('.modal-close-btn');
+                  const cancelBtn = modal.querySelector('.cancel-btn');
+                  const applyBtn = modal.querySelector('.apply-btn');
+                  const copyBtn = modal.querySelector('.copy-btn');
+
+                  // Close modal
+                  const closeModal = () => {
+                    modal.remove();
+                  };
+
+                  closeBtn.addEventListener('click', closeModal);
+                  cancelBtn.addEventListener('click', closeModal);
+
+                  // Close on background click
+                  modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                      closeModal();
+                    }
+                  });
+
+                  // Apply changes
+                  applyBtn.addEventListener('click', () => {
+                    const textToApply = result.action === 'grammar-check' ? result.corrected : result.enhanced;
+                    notepad.value = textToApply;
+                    updateCounts();
+                    updateLineNumbers();
+                    closeModal();
+                    const successMessage = result.action === 'grammar-check' ? 'Grammar corrections applied successfully!' : 'Text enhanced successfully!';
+                    showNotification(successMessage, 'success');
+                  });
+
+                  // Copy result
+                  copyBtn.addEventListener('click', async () => {
+                    try {
+                      const textToCopy = result.action === 'grammar-check' ? result.corrected : result.enhanced;
+                      await navigator.clipboard.writeText(textToCopy);
+                      const copyMessage = result.action === 'grammar-check' ? 'Corrected text copied to clipboard!' : 'Enhanced text copied to clipboard!';
+                      showNotification(copyMessage, 'success');
+                    } catch (error) {
+                      console.error('Failed to copy text:', error);
+                      showNotification('Failed to copy text to clipboard.', 'error');
+                    }
+                  });
+
+                  // Keyboard shortcuts
+                  document.addEventListener('keydown', function handleKeydown(e) {
+                    if (e.key === 'Escape') {
+                      closeModal();
+                      document.removeEventListener('keydown', handleKeydown);
+                    }
+                  });
+                }
+
+                // Show AI error
+                function showAIError(message) {
+                  showNotification(`AI Error: ${message}`, 'error');
+                }
+
+                // Show notification
+                function showNotification(message, type = 'info') {
+                  // Create notification element
+                  const notification = document.createElement('div');
+                  notification.className = `notification notification-${type}`;
+                  notification.textContent = message;
+                  
+                  // Add styles
+                  notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    color: white;
+                    font-size: 14px;
+                    z-index: 10001;
+                    max-width: 300px;
+                    word-wrap: break-word;
+                    animation: slideIn 0.3s ease;
+                  `;
+                  
+                  // Set background color based on type
+                  switch (type) {
+                    case 'success':
+                      notification.style.backgroundColor = '#4caf50';
+                      break;
+                    case 'error':
+                      notification.style.backgroundColor = '#f44336';
+                      break;
+                    case 'warning':
+                      notification.style.backgroundColor = '#ff9800';
+                      break;
+                    default:
+                      notification.style.backgroundColor = '#2196f3';
+                  }
+                  
+                  document.body.appendChild(notification);
+                  
+                  // Remove after 5 seconds
+                  setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                  }, 5000);
+                }
+
+                // Escape HTML to prevent XSS
+                function escapeHtml(text) {
+                  const div = document.createElement('div');
+                  div.textContent = text;
+                  return div.innerHTML;
+                }
+
+                // Add CSS animations
+                const style = document.createElement('style');
+                style.textContent = `
+                  @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                  }
+                  @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                  }
+                `;
+                document.head.appendChild(style);
+
+    // Textarea event listeners
+    notepad.addEventListener('input', () => {
+      updateLineNumbers();
+      updateCounts();
+      updateCursorPosition();
+      
+      // Mark current tab as modified and save content
+      if (tabs[activeTabIndex]) {
+        const currentContent = notepad.value;
+        tabs[activeTabIndex].content = currentContent;
+        tabs[activeTabIndex].isModified = currentContent !== tabs[activeTabIndex].originalContent;
+        renderTabs();
+      }
+    });
+
+    notepad.addEventListener('click', updateCursorPosition);
+    notepad.addEventListener('keyup', updateCursorPosition);
+
+    // Listen for text operations from main process
+    window.electronAPI.onClearText(() => {
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].content = '';
+        tabs[activeTabIndex].originalContent = '';
+        tabs[activeTabIndex].title = 'Untitled';
+        tabs[activeTabIndex].filePath = null;
+        tabs[activeTabIndex].isModified = false;
+        notepad.value = '';
+        fileInfo.textContent = 'Untitled';
+        updateLineNumbers();
+        updateCounts();
+        updateCursorPosition();
+        renderTabs();
+      }
+    });
+
+    window.electronAPI.onSetText((event, content) => {
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].content = content;
+        tabs[activeTabIndex].originalContent = content;
+        notepad.value = content;
+        updateLineNumbers();
+        updateCounts();
+        updateCursorPosition();
+      }
+    });
+
+    window.electronAPI.onUpdateFileInfo((event, filename) => {
+      if (tabs[activeTabIndex]) {
+        tabs[activeTabIndex].title = filename;
+        fileInfo.textContent = filename;
+        renderTabs();
+      }
+    });
+
+    // Auto-save functionality
+    let autoSaveInterval;
+    notepad.addEventListener('input', () => {
+      clearTimeout(autoSaveInterval);
+      autoSaveInterval = setTimeout(async () => {
+        const content = notepad.value;
+        if (content.trim()) {
+          await window.electronAPI.saveFile(content);
+        }
+      }, 30000); // 30 seconds
+    });
+
+    // Initialize with first tab
+    createTab();
+  </script>
+</body>
+</html>
