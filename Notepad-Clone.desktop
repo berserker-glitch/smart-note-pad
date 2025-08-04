@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Notepad Clone
+Comment=Launch Notepad Clone App
+Exec=%d/start-notepad.sh
+Icon=%d/notepad-clone/src/assets/ico/notepad.png
+Terminal=false
+StartupNotify=true
+Categories=Utility;TextEditor;
+StartupWMClass=notepad-clone
